@@ -30,9 +30,9 @@
         <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="login_tab"
             onclick="document.getElementById('login').style.display ='block'"><i
                 class="fa fa-sign-in"></i>&nbsp;Login</button>
-        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="data_tab" style="display: none;"><i
+        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="data_tab"><i
                 class="fa fa-file"></i>&nbsp;Data</button>
-        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="scan_tab" style="display: none;"><i
+        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="scan_tab"><i
                 class="fa fa-search"></i>&nbsp;Scanner</button>
         <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="labeling_tab"
             onclick="document.getElementById('labeling').style.display ='block'"><i
@@ -41,7 +41,7 @@
             onclick="document.getElementById('trainning').style.display ='block'"><i
                 class="fa fa-refresh"></i>&nbsp;Train</button>
         <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="report_tab"
-            onclick="document.getElementById('report').style.display ='block'" style="display: none;"><i
+            onclick="document.getElementById('report').style.display ='block'"><i
                 class="fa fa-print"></i>&nbsp;Report</button>
         <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="terminal_tab"
             onclick="document.getElementById('terminal').style.display ='block'"><i

@@ -358,9 +358,9 @@ window.onload = function () {
         if (localStorage.getItem("username") || sessionStorage.getItem("username")) {
             document.getElementById('login_tab').style.display = 'none';
             document.getElementById('train_tab').style.display = 'block';
-            document.getElementById('report_tab').style.display = 'block';
+            document.getElementById('report_tab').style.display = 'none';
             document.getElementById('data_tab').style.display = 'block';
-            document.getElementById('scan_tab').style.display = 'block';
+            document.getElementById('scan_tab').style.display = 'none';
             document.getElementById('terminal_tab').style.display = 'block';
             document.getElementById('labeling_tab').style.display = 'block';
             document.getElementById('setting_tab').style.display = 'block';
