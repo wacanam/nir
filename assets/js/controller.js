@@ -38,7 +38,7 @@ xhttp.onreadystatechange = function () {
                     window.location.reload();
                 } else {
                     document.getElementById("result").innerHTML =
-                        "Sorry, your browser does not support Web Storage...";
+                        "Sorry, your broSocketer does not support Web Storage...";
                 }
             } else if (responseJSON.status == 1 && responseJSON.remember == 1) {
                 // handle true
@@ -49,7 +49,7 @@ xhttp.onreadystatechange = function () {
                     window.location.reload();
                 } else {
                     document.getElementById("result").innerHTML =
-                        "Sorry, your browser does not support Web Storage...";
+                        "Sorry, your broSocketer does not support Web Storage...";
                 }
             } else {
                 // default
@@ -150,8 +150,9 @@ function log(data) {
 }
 
 function connect() {
-    // Socket = new WebSocket('ws://192.168.1.2:81/');
-    Socket = new WebSocket('ws://' + window.location.hostname + ':81/');
+    // Socket = new WebSocket('Socket://192.168.1.2:81/');
+    let connectionTries = 3;
+    Socket = new WebSocket('Socket://' + window.location.hostname + ':81/');
     Socket.onopen = function () {
         // subscribe to some channels
         document.getElementById("connection_status").innerHTML = "Status: Connected to: " + window.location
@@ -216,11 +217,11 @@ function connect() {
         console.log('Socket is closed. Reconnect will be attempted in 5 second.', e.reason);
         log('Socket is closed. Reconnect will be attempted in 5 second.');
         document.getElementById('reconnect').disabled = false;
-        setTimeout(function () {
-            console.log("Reconnecting!!!");
-            log('Reconnecting!!!');
-            connect();
-        }, 5000);
+        // setTimeout(function () {
+        //     console.log("Reconnecting!!!");
+        //     log('Reconnecting!!!');
+        //     connect();
+        // }, 5000);
     };
 
     Socket.onerror = function (err) {
@@ -230,16 +231,33 @@ function connect() {
         console.error('Socket encountered error: ', err.message, 'Closing socket');
         Socket.close();
     };
+
+    Socket.addEventListener("onclose", e => {
+        // readyState === 3 is CLOSED
+        if (e.target.readyState === 3) {
+            connectionTries--;
+
+            if (tconnectionTries > 0) {
+                console.log("Reconnecting!!!");
+                log('Reconnecting!!!');
+                setTimeout(() => connect(), 5000);
+            } else {
+                throw new Error("Maximum number of connection trials has been reached");
+            }
+
+        }
+    });
 }
 
-function findLabel() {
+async function findLabel() {
     let args;
     const ele = document.getElementsByName('label');
     for (i = 0; i < ele.length; i++) {
         if (ele[i].checked)
             args = i;
     }
-    fit(input, label(args));
+    const resp = await model.fit(input, label(args));
+    console.log(resp.history.loss[0]);
 }
 
 function label(args) {
@@ -364,7 +382,7 @@ window.onload = function () {
             document.getElementById('terminal_tab').style.display = 'block';
             document.getElementById('labeling_tab').style.display = 'block';
             document.getElementById('setting_tab').style.display = 'block';
-            document.getElementById('logout_tab').style.display = 'block';
+            document.getElementById('logout_tab').style.display = 'none';
             document.getElementById('non_member').style.display = 'none';
         } else {
             document.getElementById('login_tab').style.display = 'block';
