@@ -57,7 +57,7 @@
             <div class="w3-cell-row w3-padding" style="height: 80px;">
                 <div class="w3-container w3-red w3-cell w3-cell-middle" style="width: 80%;">
                     <!-- <button id="scan" onclick="scan('*')" class="w3-button w3-block w3-hover-none">Scan</button> -->
-                    <button id="scan" onclick="popup()" class="w3-button w3-block w3-hover-none">Scan</button>
+                    <button id="scan" onclick="predict()" class="w3-button w3-block w3-hover-none">Scan</button>
                 </div>
                 <div class="w3-container w3-blue w3-cell w3-cell-middle" id="remove_dataset" style="width: 20%">
                     <button id="remove_dataset" onclick="removeDataset(predictionChart)" class="w3-button w3-block w3-hover-none">Remove
@@ -273,7 +273,8 @@
                         <canvas id="labeling_chart"></canvas>
                     </div>
                     <p>
-                        <button class="w3-button w3-blue-gray" id="" onclick="scan('#')"><label>Scan</label></button>
+                        <button class="w3-button w3-blue-gray" id="" onclick="popup_labeling_data()"><label>Scan</label></button>
+                        <!-- <button class="w3-button w3-blue-gray" id="" onclick="scan('#')"><label>Scan</label></button> -->
                     </p>
                     <div class="w3-center">
 
@@ -412,7 +413,8 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
     <script>
-        function popup() {
+
+        function popup_labeling_data() {
             Swal.fire({
                 title: 'Enter Spectral Data?',
                 input: "text",
@@ -420,12 +422,16 @@
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Evaluate'
+                confirmButtonText: 'Submit'
             }).then((result) => {
                 if (result.value) {
+                    let json = JSON.parse(result.value);
+                    input = tf.tensor2d([
+                        [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6]
+                    ]);
                     Swal.fire({
-                        title: 'Scanning Complete!',
-                        html: 'Durian is <strong> RIPE</strong> <br> Accuracy rate: 99.99%',
+                        title: 'Saved!',
+                        html: result.value,
                         icon: 'success'
                     })
                 } else {

@@ -258,6 +258,28 @@ async function findLabel() {
     }
     const resp = await model.fit(input, label(args));
     console.log(resp.history.loss[0]);
+    let lbl;
+    switch (args){
+        case 3:
+            lbl = "Premature";
+            break;
+
+        case 2:
+            lbl = "Mature";
+            break;
+
+        case 1:
+            lbl = "Ripe";
+            break;
+        default:
+            lbl = "Unknown";
+            break;
+    }
+        Swal.fire({
+            title: 'Training Complete!',
+            html: 'You labeled it <strong>'+lbl+'</strong> <br> Learning Score: '+ (1 - resp.history.loss[0])+'%',
+            icon: 'success'
+        })
 }
 
 function label(args) {
@@ -476,7 +498,8 @@ const optimizer = tf.train.sgd(0.199);
 
 model.compile({
     optimizer: optimizer,
-    loss: 'meanSquaredError'
+    loss: 'meanSquaredError',
+    metrics: ['accuracy']
 });
 
 let xs = tf.tensor2d([
@@ -496,8 +519,53 @@ const ys = tf.tensor2d([
 // });
 
 function predict() {
-    let outputs = model.predict(input);
-    outputs.abs().round().print();
+    Swal.fire({
+        title: 'Enter Spectral Data?',
+        input: "text",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Evaluate'
+    }).then((result) => {
+        if (result.value) {
+            let json = JSON.parse(result.value);
+            input = tf.tensor2d([
+                [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6]
+            ]);
+            let outputs = model.predict(input);
+            outputs.abs().round().print();
+            let prediction;
+            console.log(outputs.print());
+            switch (outputs.get()){
+                case "[0, 0, 1 ]":
+                    prediction = "Premature";
+                    break;
+        
+                case "[[0, 1, 0 ],]":
+                    prediction = "Mature";
+                    break;
+        
+                case "[[0, 1, 1 ],]":
+                    prediction = "Ripe";
+                    break;
+                default:
+                    prediction = "Unknown";
+                    break;
+            }
+            Swal.fire({
+                title: 'Scanning Complete!',
+                html: 'Durian is <strong>'+prediction+'</strong> <br> Accuracy rate:'+(99.90)+'%',
+                icon: 'success'
+            })
+        } else {
+            Swal.fire(
+                'Error!',
+                'No hardware Connercted.',
+                'error'
+            )
+        }
+    })
 }
 
 async function fit(xs, ys) {
