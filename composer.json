@@ -1,0 +1,12 @@
+{
+    "name": "wacanam/nir",
+    "require": {
+        "php": "^7.4"
+    },
+    "authors": [
+        {
+            "name": "wacanam",
+            "email": "wacanam@gmail.com"
+        }
+    ]
+}
