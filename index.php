@@ -191,18 +191,22 @@
                     <h1 class="w3-text-blue">Make me more Smarter</h1>
 
                     <label class=""><b>Upload Trainning datasets</b></label>
-                    <input class="w3-input w3-border" type="file" name="trainning_data" id="trainning_data" placeholder="datasets.csv" accept=".csv, .json" required>
+                    <input class="w3-input w3-border" type="file" name="trainning_data" id="trainning_data" placeholder="spectral_data.json" accept=".json" required>
 
                     <label class=""><b>Learning Rate</b></label>
-                    <input class="w3-input w3-border" type="number" name="learning_rate" id="learning_rate" placeholder="0.5">
+                    <input class="w3-input w3-border" type="number" name="learning_rate" id="learning_rate" placeholder="0.199" value="0.199">
                     <label class=""><b>Epochs</b></label>
-                    <input class="w3-input w3-border" type="number" name="epochs" id="epochs" placeholder="5">
+                    <input class="w3-input w3-border" type="number" name="epochs" id="epochs" placeholder="5" value="5">
+                    <label class=""><b>Iteration</b></label>
+                    <input class="w3-input w3-border" type="number" name="epochs" id="iteration" placeholder="10" value="10">
 
                     <input class="w3-check" type="checkbox" name="shuffle" id="shuffle" checked="checked">
                     <label>Shuffle</label>
 
                     <p>
-                        <button class="w3-btn w3-teal" id="train" onclick="train()">Train</button>
+                        <button class="w3-btn w3-teal" id="train" onclick="train().then(() => { document.getElementById('trainning_status').innerHTML = 'Status : Trainning Complete!';});">Train</button>
+
+                        <span class="w3-right w3-padding w3-small" id="trainning_score_status">Trainning Score :0%</span>
                         <span class="w3-right w3-padding w3-small" id="trainning_status">Status: N/A</span>
                     </p>
 
@@ -299,9 +303,9 @@
 
                 </div>
                 <div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
-                    <button onclick="document.getElementById('labeling').style.display='none'" type="button" class="w3-button w3-red">Close</input>
-                        <!-- <span class="w3-right w3-padding w3-small"><button class="fa fa-download w3-padding-small w3-green"></button>&nbsp;Download as PDF?</span> -->
-                        <!-- <span class="w3-right w3-padding w3-small"><button class="fa fa-upload w3-padding-small w3-blue"></button>&nbsp;Upload to Cloud Pool?</span> -->
+                    <button onclick="document.getElementById('labeling').style.display='none'" class="w3-button w3-red w3-margin w3-padding">Close</button>
+                    <span class="w3-right w3-padding w3-small"><a class="fa fa-download w3-padding-small w3-green" id="download_json">&nbsp;Download as .JSON?</a></span>
+                    <!-- <span class="w3-right w3-padding w3-small"><button class="fa fa-upload w3-padding-small w3-blue"></button>&nbsp;Upload to Cloud Pool?</span> -->
                 </div>
 
             </div>
@@ -413,8 +417,16 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
     <script>
+        var json = {};
+        let labelList = [
+            'Unknown',
+            'Ripe',
+            'Matured',
+            'Prematured'
+        ];
 
         function popup_labeling_data() {
+            removeDataset(labelingChart);
             Swal.fire({
                 title: 'Enter Spectral Data?',
                 input: "text",
@@ -425,7 +437,9 @@
                 confirmButtonText: 'Submit'
             }).then((result) => {
                 if (result.value) {
-                    let json = JSON.parse(result.value);
+                    json = JSON.parse(result.value);
+                    let data = [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6];
+                    addDataset(labelingChart, "Scanned", data)
                     input = tf.tensor2d([
                         [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6]
                     ]);
@@ -442,6 +456,48 @@
                     )
                 }
             })
+        }
+
+        function SaveDataToLocalStorage(data) {
+            var a = [];
+            // Parse the serialized data back into an aray of objects
+            a = JSON.parse(localStorage.getItem('session')) || [];
+            // Push the new data (whether it be an object or anything else) onto the array
+            a.push(data);
+            // Alert the array value
+            // Re-serialize the array back into a string and store it in localStorage
+            localStorage.setItem('session', JSON.stringify(a));
+        }
+
+        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(((localStorage.getItem('session'))));
+        var dlAnchorElem = document.getElementById('download_json');
+        dlAnchorElem.setAttribute("href", dataStr);
+        dlAnchorElem.setAttribute("download", "spectral_data.json");
+
+
+        const jsonFile = document.getElementById('trainning_data');
+        jsonFile.addEventListener("change", handleFile, false);
+
+        function handleFile() {
+            const file = this.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                var jsonData = JSON.parse(e.target.result);
+                let temp_xs = [];
+                let temp_ys = [];
+                jsonData.forEach(function(data, index) {
+                    temp_xs.push([data.ch1, data.ch2, data.ch3, data.ch4, data.ch5, data.ch6]);
+                    temp_ys.push(data.label_args);
+                })
+                console.log(temp_ys);
+                xs = tf.tensor2d(temp_xs);
+                let indices = tf.tensor1d(temp_ys, 'int32');
+                ys = tf.oneHot(indices, 3);
+                indices.print();
+                xs.print();
+                ys.print();
+            };
+            reader.readAsText(file);
         }
     </script>
     <script src="./assets/js/controller.js"></script>

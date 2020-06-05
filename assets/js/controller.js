@@ -1,4 +1,5 @@
 const xhttp = new XMLHttpRequest();
+var loss;
 
 xhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
@@ -176,7 +177,7 @@ function connect() {
             spectral_data.Ch3,
             spectral_data.Ch4,
             spectral_data.Ch5,
-            spectral_data.Ch6,
+            spectral_data.Ch6
         ];
         console.log(data);
         if (spectral_data.dist == 'labeling') {
@@ -188,7 +189,7 @@ function connect() {
                     spectral_data.Ch3,
                     spectral_data.Ch4,
                     spectral_data.Ch5,
-                    spectral_data.Ch6,
+                    spectral_data.Ch6
                 ]
             ]);
 
@@ -257,7 +258,8 @@ async function findLabel() {
             args = i;
     }
     const resp = await model.fit(input, label(args));
-    console.log(resp.history.loss[0]);
+    json.label_args = args;
+    loss = ((1 - resp.history.loss[0])*100).toPrecision(5);
     let lbl;
     switch (args){
         case 3:
@@ -277,33 +279,35 @@ async function findLabel() {
     }
         Swal.fire({
             title: 'Training Complete!',
-            html: 'You labeled it <strong>'+lbl+'</strong> <br> Learning Score: '+ (1 - resp.history.loss[0])+'%',
+            html: 'You labeled it <strong>'+lbl+'</strong> <br> Learning Score: '+ loss +'%',
             icon: 'success'
-        })
+        });
+        json.label = lbl; // add label property before saving
+        SaveDataToLocalStorage(json);
 }
 
 function label(args) {
     let ys;
     switch (args) {
+        case 0:
+            ys = tf.tensor2d([
+                [1, 0, 0]
+            ]);
+            break;
         case 1:
             ys = tf.tensor2d([
-                [0, 0, 1]
-            ])
+                [0, 1, 0]
+            ]);
             break;
         case 2:
             ys = tf.tensor2d([
-                [0, 1, 0]
-            ])
-            break;
-        case 3:
-            ys = tf.tensor2d([
-                [0, 1, 1]
-            ])
+                [0, 0, 1]
+            ]);
             break;
         default:
             ys = tf.tensor2d([
                 [0, 0, 0]
-            ])
+            ]);
             break;
     }
     return ys;
@@ -494,7 +498,7 @@ model.add(hidden2);
 model.add(output);
 
 
-const optimizer = tf.train.sgd(0.199);
+const optimizer = tf.train.sgd(document.getElementById('learning_rate').value);
 
 model.compile({
     optimizer: optimizer,
@@ -502,20 +506,12 @@ model.compile({
     metrics: ['accuracy']
 });
 
-let xs = tf.tensor2d([
-    [0, 0, 0, 0, 0, 0]
-]);
-
-const ys = tf.tensor2d([
-    [0, 0, 0]
-]);
+let xs,ys
 
 
 
 // train().then(() => {
-//     let outputs = model.predict(input);
-//     outputs.abs().round().print()
-//     console.log("Trainning Complete!");
+        // document.getElementById('trainning_status').innerHTML = 'Status : Trainning';
 // });
 
 function predict() {
@@ -530,40 +526,40 @@ function predict() {
     }).then((result) => {
         if (result.value) {
             let json = JSON.parse(result.value);
+            let data = [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6];
+            addDataset(predictionChart, "Scanned", data)
             input = tf.tensor2d([
                 [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6]
             ]);
-            let outputs = model.predict(input);
-            outputs.abs().round().print();
+            const outputs = model.predict(input);
             let prediction;
-            console.log(outputs.print());
-            switch (outputs.get()){
-                case "[0, 0, 1 ]":
-                    prediction = "Premature";
+            switch (outputs.abs().round().dataSync().toString()){
+                case "1,0,0":
+                    prediction = "Unknown";
                     break;
         
-                case "[[0, 1, 0 ],]":
-                    prediction = "Mature";
-                    break;
-        
-                case "[[0, 1, 1 ],]":
+                case "0,1,0":
                     prediction = "Ripe";
                     break;
+        
+                case "0,0,1":
+                    prediction = "Mature";
+                    break;
                 default:
-                    prediction = "Unknown";
+                    prediction = "Premature";
                     break;
             }
             Swal.fire({
                 title: 'Scanning Complete!',
-                html: 'Durian is <strong>'+prediction+'</strong> <br> Accuracy rate:'+(99.90)+'%',
+                html: 'Durian is <strong>'+prediction+'</strong> <br> Accuracy rate:'+ loss +'%',
                 icon: 'success'
-            })
+            });
         } else {
             Swal.fire(
                 'Error!',
                 'No hardware Connercted.',
                 'error'
-            )
+            );
         }
     })
 }
@@ -574,15 +570,18 @@ async function fit(xs, ys) {
 }
 
 async function train() {
-    for (let i = 0; i <= 10; i++) {
+    for (let i = 0; i <= document.getElementById("iteration").value; i++) {
         const training_setting = {
             shuffle: true,
-            epochs: 10
+            epochs: document.getElementById('epochs').value
         };
         const response = await model.fit(xs, ys, training_setting);
+        document.getElementById('trainning_score_status').innerHTML = 'Trainning Score: '+((1-response.history.loss[0])*100).toPrecision(5) + '%';
+        document.getElementById('trainning_status').innerHTML = 'Status : Trainning';
         console.log(response.history.loss[0]);
     }
 }
+
 
         // let outputs = model.predict(input);
         // outputs.print();
