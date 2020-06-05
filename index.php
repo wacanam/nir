@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Neural Network Based Durian Fruit Maturity and Ripeness Evaluator Employing Near-Infrared (NIR) Spectral Sensor">
-    <title>NIR Spectral Sensor</title>
+    <title>Durian Fruit Maturity and Ripeness Evaluator </title>
     <link rel="shortcut icon" href="/assets/icon/scan.ico" type="image/x-icon">
     <!-- <link rel="stylesheet" href="/assets/css/bootstrap.min.css"> -->
     <!-- <link rel="stylesheet" href="/assets/css/normalize.min.css"> -->
@@ -22,25 +22,25 @@
 
 <body onload="javascript:connect()">
 
-    <div class="w3-sidebar w3-bar-block w3-collapse w3-card w3-green" style="width:200px;" id="mySidebar">
+    <div class="w3-sidebar w3-bar-block w3-collapse w3-card w3-green" style="width:225px;" id="mySidebar">
         <button class="w3-bar-item w3-button w3-hide-large w3-right-align" id="home_tab" onclick="w3_close()"><b>&times;</b></button>
-        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide"><i class="fa fa-home"></i>&nbsp;Home</button>
-        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="login_tab" onclick="document.getElementById('login').style.display ='block'"><i class="fa fa-sign-in"></i>&nbsp;Login</button>
-        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="data_tab"><i class="fa fa-file"></i>&nbsp;Data</button>
-        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="scan_tab"><i class="fa fa-search"></i>&nbsp;Scanner</button>
-        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="labeling_tab" onclick="document.getElementById('labeling').style.display ='block'"><i class="fa fa-refresh"></i>&nbsp;Labeling</button>
-        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="train_tab" onclick="document.getElementById('trainning').style.display ='block'"><i class="fa fa-refresh"></i>&nbsp;Train</button>
-        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="report_tab" onclick="document.getElementById('report').style.display ='block'"><i class="fa fa-print"></i>&nbsp;Report</button>
-        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="terminal_tab" onclick="document.getElementById('terminal').style.display ='block'"><i class="fa fa-terminal"></i>&nbsp;Console
+        <button href="#" class="w3-bar-item w3-button w3-large w3-wide"><i class="fa fa-home"></i>&nbsp;Home</button>
+        <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="login_tab" onclick="document.getElementById('login').style.display ='block'"><i class="fa fa-sign-in"></i>&nbsp;Login</button>
+        <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="data_tab"><i class="fa fa-file"></i>&nbsp;Data</button>
+        <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="scan_tab"><i class="fa fa-search"></i>&nbsp;Scanner</button>
+        <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="labeling_tab" onclick="document.getElementById('labeling').style.display ='block'"><i class="fa fa-edit"></i>&nbsp;Labeling</button>
+        <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="train_tab" onclick="document.getElementById('trainning').style.display ='block'"><i class="fa fa-refresh"></i>&nbsp;Train</button>
+        <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="report_tab" onclick="document.getElementById('report').style.display ='block'"><i class="fa fa-print"></i>&nbsp;Report</button>
+        <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="terminal_tab" onclick="document.getElementById('terminal').style.display ='block'"><i class="fa fa-terminal"></i>&nbsp;Console
             log</button>
-        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="setting_tab" onclick="document.getElementById('setting').style.display ='block'"><i class="fa fa-gear"></i>&nbsp;Setting</button>
-        <button href="#" class="w3-bar-item w3-button w3-medium w3-wide" id="logout_tab" onclick="document.getElementById('logout').style.display ='block'"><i class="fa fa-sign-out"></i>&nbsp;Logout</button>
+        <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="setting_tab" onclick="document.getElementById('setting').style.display ='block'"><i class="fa fa-gear"></i>&nbsp;Setting</button>
+        <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="logout_tab" onclick="document.getElementById('logout').style.display ='block'"><i class="fa fa-sign-out"></i>&nbsp;Logout</button>
     </div>
     <div class="w3-main" style="margin-left:200px">
         <div class="w3-teal">
             <button class="w3-button w3-teal w3-xlarge w3-hide-large" onclick="w3_open()">&#9776;</button>
             <div class="w3-container">
-                <h1 class="w3-wide">NIR Spectral Sensor</h1>
+                <h2 class="w3-wide">Durian Fruit Maturity and Ripeness Evaluator</h2>
             </div>
         </div>
         <div>
@@ -213,8 +213,8 @@
                 </div>
                 <div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
                     <button onclick="document.getElementById('trainning').style.display='none'" type="button" class="w3-button w3-red">Close</button>
-                    <!-- <span class="w3-right w3-padding w3-small"><button class="fa fa-save w3-padding-small w3-green"></button>&nbsp;Save as txt?</span> -->
-                    <!-- <span class="w3-right w3-padding w3-small"><button class="fa fa-check w3-padding-small w3-blue"></button>&nbsp;Apply tranning?</span> -->
+                    <span class="w3-right w3-padding w3-small"><a class="fa fa-download w3-padding-small w3-green" id="download_model_json" onclick="download_model_json().then(() => {Swal.fire('Saved!', 'success')})"></a>&nbsp;Download model as .jSON</span>
+                    <span class="w3-right w3-padding w3-small"><a class="fa fa-refresh w3-padding-small w3-blue" onclick="load_model_json().then(()=> {Swal.fire({title: 'Loaded!', icon: 'success' })})"></a>&nbsp;Load Model</span>
                 </div>
 
             </div>
@@ -304,7 +304,7 @@
                 </div>
                 <div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
                     <button onclick="document.getElementById('labeling').style.display='none'" class="w3-button w3-red w3-margin w3-padding">Close</button>
-                    <span class="w3-right w3-padding w3-small"><a class="fa fa-download w3-padding-small w3-green" id="download_json">&nbsp;Download as .JSON?</a></span>
+                    <span class="w3-right w3-padding w3-small"><a class="fa fa-download w3-padding-small w3-green" id="download_json"></a>&nbsp;Download as .JSON?</span>
                     <!-- <span class="w3-right w3-padding w3-small"><button class="fa fa-upload w3-padding-small w3-blue"></button>&nbsp;Upload to Cloud Pool?</span> -->
                 </div>
 
@@ -458,21 +458,31 @@
             })
         }
 
-        function SaveDataToLocalStorage(data) {
+        function SaveDataToLocalStorage(location, data) {
             var a = [];
             // Parse the serialized data back into an aray of objects
-            a = JSON.parse(localStorage.getItem('session')) || [];
+            a = JSON.parse(localStorage.getItem(location)) || [];
             // Push the new data (whether it be an object or anything else) onto the array
             a.push(data);
             // Alert the array value
             // Re-serialize the array back into a string and store it in localStorage
-            localStorage.setItem('session', JSON.stringify(a));
+            localStorage.setItem('labeled', JSON.stringify(a));
         }
 
-        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(((localStorage.getItem('session'))));
+        var dataStr1 = "data:text/json;charset=utf-8," + encodeURIComponent(((localStorage.getItem('labeled'))));
         var dlAnchorElem = document.getElementById('download_json');
-        dlAnchorElem.setAttribute("href", dataStr);
+        dlAnchorElem.setAttribute("href", dataStr1);
         dlAnchorElem.setAttribute("download", "spectral_data.json");
+
+        async function download_model_json() {
+            const model_json = await model.save('downloads://NIR_model');
+            const model_json_localStorage = await model.save('localstorage://NIR_model');
+        }
+        async function load_model_json() {
+            const load_model_json = await tf.loadLayersModel('localstorage://NIR_model');
+            log()
+        }
+
 
 
         const jsonFile = document.getElementById('trainning_data');

@@ -283,7 +283,7 @@ async function findLabel() {
             icon: 'success'
         });
         json.label = lbl; // add label property before saving
-        SaveDataToLocalStorage(json);
+        SaveDataToLocalStorage('labeled', json);
 }
 
 function label(args) {
