@@ -72,7 +72,7 @@ function login() {
     formData.append("password", document.getElementById("password").value);
     formData.append("remember", document.getElementById("remember").value);
 
-    xhttp.open("POST", "http://" + window.location.hostname + "/login", true);
+    xhttp.open("POST", "http://" + window.location.host + "/login", true);
     xhttp.send(formData);
 }
 
@@ -92,7 +92,7 @@ function train() {
     formData.append("epochs", document.getElementById("epochs").value);
     formData.append("shuffle", document.getElementById("shuffle").value);
 
-    xhttp.open("POST", "http://" + window.location.hostname + "/train", true);
+    xhttp.open("POST", "http://" + window.location.host + "/train", true);
     xhttp.send(formData);
 }
 
@@ -131,7 +131,7 @@ function save_setting() {
 
     xhttp.open(
         "POST",
-        "http://" + window.location.hostname + "/save_setting",
+        "http://" + window.location.host + "/save_setting",
         true
     );
     xhttp.send(formData);
@@ -140,7 +140,7 @@ function save_setting() {
 function load_setting() {
     xhttp.open(
         "POST",
-        "http://" + window.location.hostname + "/load_setting",
+        "http://" + window.location.host + "/load_setting",
         true
     );
     xhttp.send();
@@ -196,18 +196,18 @@ function downloadTxt() {
 function connect() {
     // Socket = new WebSocket('Socket://192.168.1.2:81/');
     let connectionTries = 3;
-    const Socket = new WebSocket("Socket://" + window.location.hostname + ":81/");
+    const Socket = new WebSocket("Socket://" + window.location.host + ":81/");
     Socket.onopen = function () {
         // subscribe to some channels
         document.getElementById("connection_status").innerHTML =
-            "Status: Connected to: " + window.location.hostname + ":81/";
+            "Status: Connected to: " + window.location.host + ":81/";
         Socket.send(
             JSON.stringify({
                 status: "connected",
             })
         );
         // console.log('Connected to: ' + window.location.hostname + ':81/');
-        log("Connected to: " + window.location.hostname + ":81/");
+        log("Connected to: " + window.location.host + ":81/");
         document.getElementById("reconnect").disabled = true;
     };
 
@@ -472,8 +472,8 @@ let xs, ys;
 async function loadModel() {
     model = await tf.loadLayersModel(
         "http://" +
-        window.location.hostname +
-        ":8080/data/assets/uploads/NIR_model.json"
+        window.location.host +
+        "/data/assets/uploads/NIR_model.json"
     );
     // model.summary();
     compileModel();
