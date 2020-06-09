@@ -14,9 +14,9 @@
 
     <script src="./assets/js/Chart.min.js"></script>
     <script src="./assets/js/jquery.min.js"></script>
-    <!-- <script src="./assets/js/fontawesome.min.js"></script> -->
+    <script src="./assets/js/fontawesome.min.js"></script>
     <script src="./assets/js/tf.min.js"></script>
-    <!-- <script src="/assets/js/jquery-ui.min.js"></script> -->
+    <script src="/assets/js/jquery-ui.min.js"></script>
 
 </head>
 
@@ -204,7 +204,7 @@
                     <label>Shuffle</label>
 
                     <p>
-                        <button class="w3-btn w3-teal" id="train" onclick="train().then(() => { document.getElementById('training_status').innerHTML = 'Status : training Complete!';});">Train</button>
+                        <button class="w3-btn w3-teal" id="train" onclick='train().then(() => { document.getElementById("training_status").innerHTML = "<i class=\"fa fa-check\" style=\"font-size:20px;color:teal;\"></i>Status : Training Complete!";})';>Train</button>
 
                         <span class="w3-right w3-padding w3-small" id="training_score_status">Training Score :0%</span>
                         <span class="w3-right w3-padding w3-small" id="training_status">Status: N/A</span>

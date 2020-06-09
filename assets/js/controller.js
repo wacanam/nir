@@ -582,7 +582,7 @@ async function train() {
             ((1 - response.history.loss[0]) * 100).toPrecision(5) +
             "%";
         document.getElementById("training_status").innerHTML =
-            "Status : Training";
+            '<i class="fa fa-spinner fa-spin"style="font-size:20px;color:teal;"></i> Status : Training';
         loss = ((1 - response.history.loss[0]) * 100).toPrecision(5);
         log(
             "Training model with " +
