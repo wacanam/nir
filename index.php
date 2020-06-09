@@ -29,7 +29,7 @@
         <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="data_tab"><i class="fa fa-file"></i>&nbsp;Data</button>
         <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="scan_tab"><i class="fa fa-search"></i>&nbsp;Scanner</button>
         <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="labeling_tab" onclick="document.getElementById('labeling').style.display ='block'"><i class="fa fa-edit"></i>&nbsp;Labeling</button>
-        <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="train_tab" onclick="document.getElementById('trainning').style.display ='block'"><i class="fa fa-refresh"></i>&nbsp;Train</button>
+        <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="train_tab" onclick="document.getElementById('training').style.display ='block'"><i class="fa fa-refresh"></i>&nbsp;Train</button>
         <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="report_tab" onclick="document.getElementById('report').style.display ='block'"><i class="fa fa-print"></i>&nbsp;Report</button>
         <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="terminal_tab" onclick="document.getElementById('terminal').style.display ='block'"><i class="fa fa-terminal"></i>&nbsp;Console
             log</button>
@@ -173,25 +173,25 @@
 
         <!-- W3 Modal for Machine Learing Log -->
 
-        <div id="trainning" class="w3-modal">
+        <div id="training" class="w3-modal">
             <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width:600px">
 
                 <div class="w3-center"><br>
-                    <span onclick="document.getElementById('trainning').style.display='none'" class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close Modal">&times;</span>
+                    <span onclick="document.getElementById('training').style.display='none'" class="w3-button w3-xlarge w3-hover-red w3-display-topright" title="Close Modal">&times;</span>
                 </div>
-                <div class="w3-panel w3-red" id="trainning_error" style="display: none;">
+                <div class="w3-panel w3-red" id="training_error" style="display: none;">
                     <h3>Opps!</h3>
                     <p>Something wrong happened.</p>
                 </div>
-                <div class="w3-panel w3-green" id="trainning_done" style="display: none;">
+                <div class="w3-panel w3-green" id="training_done" style="display: none;">
                     <h3>WOW!</h3>
                     <p>Finnish, why don't you give a try?</p>
                 </div>
                 <div class="w3-container">
                     <h1 class="w3-text-blue">Make me more Smarter</h1>
 
-                    <label class=""><b>Upload Trainning datasets</b></label>
-                    <input class="w3-input w3-border" type="file" name="trainning_data" id="trainning_data" placeholder="spectral_data.json" accept=".json" required>
+                    <label class=""><b>Upload Training datasets</b></label>
+                    <input class="w3-input w3-border" type="file" name="training_data" id="training_data" placeholder="spectral_data.json" accept=".json" required>
 
                     <label class=""><b>Learning Rate</b></label>
                     <input class="w3-input w3-border" type="number" name="learning_rate" id="learning_rate" placeholder="0.199" value="0.199">
@@ -204,15 +204,15 @@
                     <label>Shuffle</label>
 
                     <p>
-                        <button class="w3-btn w3-teal" id="train" onclick="train().then(() => { document.getElementById('trainning_status').innerHTML = 'Status : Trainning Complete!';});">Train</button>
+                        <button class="w3-btn w3-teal" id="train" onclick="train().then(() => { document.getElementById('training_status').innerHTML = 'Status : ing Complete!';});">Train</button>
 
-                        <span class="w3-right w3-padding w3-small" id="trainning_score_status">Trainning Score :0%</span>
-                        <span class="w3-right w3-padding w3-small" id="trainning_status">Status: N/A</span>
+                        <span class="w3-right w3-padding w3-small" id="training_score_status">Training Score :0%</span>
+                        <span class="w3-right w3-padding w3-small" id="training_status">Status: N/A</span>
                     </p>
 
                 </div>
                 <div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
-                    <button onclick="document.getElementById('trainning').style.display='none'" type="button" class="w3-button w3-red">Close</button>
+                    <button onclick="document.getElementById('training').style.display='none'" type="button" class="w3-button w3-red">Close</button>
                     <span class="w3-right w3-padding w3-small"><a class="fa fa-download w3-padding-small w3-green" id="download_model_json" onclick="download_model_json().then(() => {Swal.fire({title: 'Saved!', icon: 'success'})})"></a>&nbsp;Download model as .jSON</span>
                     <span class="w3-right w3-padding w3-small"><a class="fa fa-refresh w3-padding-small w3-blue" onclick="loadModel().then(()=> {Swal.fire({title: 'Loaded!', icon: 'success' })})"></a>&nbsp;Load Model</span>
                 </div>
@@ -298,7 +298,7 @@
                         <!-- <button type="w3-button w3-red" onclick="findLabel()">Submit</button> -->
                     </div>
                     <p>
-                        <span class="w3-right w3-padding w3-small" id="trainning_status">Status: N/A</span>
+                        <span class="w3-right w3-padding w3-small" id="training_status">Status: N/A</span>
                     </p>
 
                 </div>
@@ -419,10 +419,10 @@
     <script>
         var json = {};
         let labelList = [
-            'Premature',
+            'Unknown',
             'Ripe',
             'Mature',
-            'Unknown'
+            'Premature'
         ];
         
         let dataStr1 = "data:text/json;charset=utf-8," + encodeURIComponent(((localStorage.getItem('labeled'))));
@@ -430,7 +430,7 @@
         dlAnchorElem.setAttribute("href", dataStr1);
         dlAnchorElem.setAttribute("download", "spectral_data.json");
         
-        const jsonFile = document.getElementById('trainning_data').addEventListener("change", handleFile, false);
+        const jsonFile = document.getElementById('training_data').addEventListener("change", handleFile, false);
 
         function popup_labeling_data() {
             removeDataset(labelingChart);

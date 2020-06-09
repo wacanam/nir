@@ -493,7 +493,7 @@ async function findLabel() {
     loss = ((1 - resp.history.loss[0]) * 100).toPrecision(5);
     let lbl = labelList[args];
     log(
-        "Trainning model at :" +
+        "Training model at :" +
         resp.history.loss[0] +
         "and Labeling data it as :" +
         lbl
@@ -577,15 +577,15 @@ async function train() {
             epochs: document.getElementById("epochs").value,
         };
         const response = await model.fit(xs, ys, training_setting);
-        document.getElementById("trainning_score_status").innerHTML =
-            "Trainning Score: " +
+        document.getElementById("training_score_status").innerHTML =
+            "Training Score: " +
             ((1 - response.history.loss[0]) * 100).toPrecision(5) +
             "%";
-        document.getElementById("trainning_status").innerHTML =
-            "Status : Trainning";
+        document.getElementById("training_status").innerHTML =
+            "Status : Training";
         loss = ((1 - response.history.loss[0]) * 100).toPrecision(5);
         log(
-            "Trainnig model with " +
+            "Training model with " +
             training_setting.toString() +
             "MeanSquareError : " +
             response.history.loss[0].toPrecision(5)
