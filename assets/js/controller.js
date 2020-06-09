@@ -120,8 +120,8 @@ function load_setting() {
 }
 
 
-let spectral_data, logger;
-let Socket;
+let spectral_data, txtDownloadURL;
+var logger = "";
 let input;
 
 function apply_setting() {
@@ -142,71 +142,53 @@ var chartColors = {
     grey: 'rgb(201, 203, 207)'
 };
 
-var colorNames = Object.keys(chartColors);
+const colorNames = Object.keys(chartColors);
 
 function log(data) {
     var timestamp = Date.parse(Date(Date.now()));
     logger += timestamp + " :" + data + "\n";
     document.getElementById("rxConsole").value += timestamp + " :" + data + "\n";
 }
-
+function downloadTxt(){
+    txt = new Blob([logger], {type: 'text/plain'});
+    if (txtDownloadURL) {
+        window.URL.revokeObjectURL(txtDownloadURL);
+    }
+    else {
+        document.getElementById('download_log').href = window.URL.createObjectURL(txt);
+    }
+    delete txt;
+    log('Downloading Log as .txt file');
+}
 function connect() {
     // Socket = new WebSocket('Socket://192.168.1.2:81/');
     let connectionTries = 3;
-    Socket = new WebSocket('Socket://' + window.location.hostname + ':81/');
+    const Socket = new WebSocket('Socket://' + window.location.hostname + ':81/');
     Socket.onopen = function () {
         // subscribe to some channels
         document.getElementById("connection_status").innerHTML = "Status: Connected to: " + window.location
             .hostname + ':81/';
-        // alert('Socket is Connected to: ' + window.location.hostname + ':81/');
         Socket.send(JSON.stringify({
             "status": "connected"
         }));
-        console.log('Connected to: ' + window.location.hostname + ':81/')
+        console.log('Connected to: ' + window.location.hostname + ':81/');
         log('Connected to: ' + window.location.hostname + ':81/');
         document.getElementById('reconnect').disabled = true;
     };
 
     Socket.onmessage = function (e) {
-        // console.log('Message:', e.data);
         spectral_data = JSON.parse(e.data);
-        // console.log(spectral_data);
-        let data = [
-            spectral_data.Ch1,
-            spectral_data.Ch2,
-            spectral_data.Ch3,
-            spectral_data.Ch4,
-            spectral_data.Ch5,
-            spectral_data.Ch6
-        ];
+        let data = [spectral_data.Ch1, spectral_data.Ch2, spectral_data.Ch3, spectral_data.Ch4, spectral_data.Ch5, spectral_data.Ch6];
         console.log(data);
         if (spectral_data.dist == 'labeling') {
-            addDataset(labelingChart, "Scanned", data)
-            input = tf.tensor2d([
-                [
-                    spectral_data.Ch1,
-                    spectral_data.Ch2,
-                    spectral_data.Ch3,
-                    spectral_data.Ch4,
-                    spectral_data.Ch5,
-                    spectral_data.Ch6
-                ]
-            ]);
+            addDataset(labelingChart, "Scanned", data);
+            input = tf.tensor2d([[spectral_data.Ch1, spectral_data.Ch2, spectral_data.Ch3, spectral_data.Ch4, spectral_data.Ch5, spectral_data.Ch6]]);
 
         } else {
-            addDataset(predictionChart, "Scanned", data)
-            input = tf.tensor2d([
-                [
-                    spectral_data.Ch1,
-                    spectral_data.Ch2,
-                    spectral_data.Ch3,
-                    spectral_data.Ch4,
-                    spectral_data.Ch5,
-                    spectral_data.Ch6,
-                ]
-            ]);
-            predict()
-        };
+            addDataset(predictionChart, "Scanned", data);
+            input = tf.tensor2d([[spectral_data.Ch1, spectral_data.Ch2, spectral_data.Ch3, spectral_data.Ch4, spectral_data.Ch5, spectral_data.Ch6]]);
+            predict();
+        }
         log("Message -" + spectral_data);
 
 
@@ -218,11 +200,6 @@ function connect() {
         console.log('Socket is closed. Reconnect will be attempted in 5 second.', e.reason);
         log('Socket is closed. Reconnect will be attempted in 5 second.');
         document.getElementById('reconnect').disabled = false;
-        // setTimeout(function () {
-        //     console.log("Reconnecting!!!");
-        //     log('Reconnecting!!!');
-        //     connect();
-        // }, 5000);
     };
 
     Socket.onerror = function (err) {
@@ -250,77 +227,6 @@ function connect() {
     });
 }
 
-async function findLabel() {
-    let args;
-    const ele = document.getElementsByName('label');
-    for (i = 0; i < ele.length; i++) {
-        if (ele[i].checked)
-            args = i;
-    }
-    const resp = await model.fit(input, label(args));
-    json.label_args = args;
-    loss = ((1 - resp.history.loss[0])*100).toPrecision(5);
-    let lbl;
-    switch (args){
-        case 3:
-            lbl = "Premature";
-            break;
-
-        case 2:
-            lbl = "Mature";
-            break;
-
-        case 1:
-            lbl = "Ripe";
-            break;
-        default:
-            lbl = "Unknown";
-            break;
-    }
-        Swal.fire({
-            title: 'Training Complete!',
-            html: 'You labeled it <strong>'+lbl+'</strong> <br> Learning Score: '+ loss +'%',
-            icon: 'success'
-        });
-        json.label = lbl; // add label property before saving
-        SaveDataToLocalStorage('labeled', json);
-}
-
-function label(args) {
-    let ys;
-    switch (args) {
-        case 0:
-            ys = tf.tensor2d([
-                [1, 0, 0]
-            ]);
-            break;
-        case 1:
-            ys = tf.tensor2d([
-                [0, 1, 0]
-            ]);
-            break;
-        case 2:
-            ys = tf.tensor2d([
-                [0, 0, 1]
-            ]);
-            break;
-        default:
-            ys = tf.tensor2d([
-                [0, 0, 0]
-            ]);
-            break;
-    }
-    return ys;
-
-}
-
-function sendText() {
-    var msg = document.getElementById("txBar").value;
-    Socket.send(msg);
-    log("Sending Data -" + msg);
-    document.getElementById("txBar").value = "";
-}
-
 function scan(args) {
     if (args == '#') {
         Socket.send("#")
@@ -334,25 +240,8 @@ function scan(args) {
     log("Scanning");
 }
 
-// function train() {
-//     Socket.send(JSON.stringify({
-//         "command": "train"
-//     }));
-//     log("Trainning");
-// }
-
-function sendBrightness() {
-    var value = document.getElementById("brightness").value;
-    Socket.send("#" + value);
-    Socket.send(JSON.stringify({
-        "command": "set",
-        "param": "brightness",
-        "value": value
-    }));
-    log("Setting Brightness -" + value);
-}
 //connect();
-var config = {
+const config = {
     type: 'line',
     data: {
         labels: ['610nm', '680nm', '730nm', '780nm', '810nm', '860nm'],
@@ -391,12 +280,13 @@ var config = {
         }
     }
 };
+
 window.onload = function () {
 
     localStorage.setItem("username", "admin");
     localStorage.setItem("password", "admin");
 
-    load_setting();
+    // load_setting();
     //connect();
     if (typeof (Storage) != "undefined") {
         if (localStorage.getItem("username") || sessionStorage.getItem("username")) {
@@ -423,6 +313,7 @@ window.onload = function () {
             document.getElementById('non_member').style.display = "block";
         }
     }
+    
     //HOME MAIN Chart
     const predictChart = document.getElementById('predictionChart').getContext('2d');
     predictionChart = new Chart(predictChart, config);
@@ -462,7 +353,7 @@ function removeDataset(chart) {
 
 function randomScalingFactor() {
     return Math.random(0, 1000);
-};
+}
 
 function w3_open() {
     document.getElementById("mySidebar").style.display = "block";
@@ -472,8 +363,9 @@ function w3_close() {
     document.getElementById("mySidebar").style.display = "none";
 }
 
-// Machine Learning by TensorFlow.js
 
+
+//----------------------------------- Machine Learning by TensorFlow.js -----------------------------------------
 const model = tf.sequential();
 // First layer must have an input shape defined.
 const hidden1 = tf.layers.dense({
@@ -509,10 +401,27 @@ model.compile({
 let xs,ys
 
 
-
-// train().then(() => {
-        // document.getElementById('trainning_status').innerHTML = 'Status : Trainning';
-// });
+async function findLabel() {
+    let args;
+    const ele = document.getElementsByName('label');
+    for (i = 0; i < ele.length; i++) {
+        if (ele[i].checked)
+            args = i;
+            json.label_args = args;
+    }
+    const resp = await model.fit(input, tf.oneHot(tf.tensor1d([args], 'int32'), 3));
+    loss = ((1 - resp.history.loss[0])*100).toPrecision(5);
+    let lbl = labelList[args];
+    log('Trainning model at :'+ resp.history.loss[0] +'and Labeling data it as :' +lbl);
+        Swal.fire({
+            title: 'Training Complete!',
+            html: 'You labeled it <strong>'+lbl+'</strong> <br> Learning Score: '+ loss +'%',
+            icon: 'success'
+        });
+        json.label = lbl; // add label property before saving
+        log('Saving New data to Local storage');
+        SaveDataToLocalStorage('labeled', json);
+}
 
 function predict() {
     Swal.fire({
@@ -525,49 +434,55 @@ function predict() {
         confirmButtonText: 'Evaluate'
     }).then((result) => {
         if (result.value) {
-            let json = JSON.parse(result.value);
-            let data = [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6];
-            addDataset(predictionChart, "Scanned", data)
-            input = tf.tensor2d([
-                [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6]
-            ]);
-            const outputs = model.predict(input);
-            let prediction;
-            switch (outputs.abs().round().dataSync().toString()){
-                case "1,0,0":
-                    prediction = "Unknown";
-                    break;
-        
-                case "0,1,0":
-                    prediction = "Ripe";
-                    break;
-        
-                case "0,0,1":
-                    prediction = "Mature";
-                    break;
-                default:
-                    prediction = "Premature";
-                    break;
+            try {
+                let json = JSON.parse(result.value);
+                let data = [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6];
+                addDataset(predictionChart, "Scanned", data);
+                input = tf.tensor2d([
+                    [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6]
+                ]);
+                const outputs = model.predict(input);
+                let prediction;
+                switch (outputs.abs().round().dataSync().toString()){
+                    case "1,0,0":
+                        prediction = "Unknown";
+                        break;
+            
+                    case "0,1,0":
+                        prediction = "Ripe";
+                        break;
+            
+                    case "0,0,1":
+                        prediction = "Mature";
+                        break;
+                    default:
+                        prediction = "Premature";
+                        break;
+                }
+                Swal.fire({
+                    title: 'Scanning Complete!',
+                    html: 'Durian is <strong>'+prediction+'</strong>',
+                    icon: 'success'
+                });
+                log('Evaluation data; Result: ' +prediction);
             }
-            Swal.fire({
-                title: 'Scanning Complete!',
-                html: 'Durian is <strong>'+prediction+'</strong> <br> Accuracy rate:'+ loss +'%',
-                icon: 'success'
-            });
-        } else {
-            Swal.fire(
-                'Error!',
-                'No hardware Connercted.',
-                'error'
-            );
+            catch (e){
+                Swal.fire(
+                    'Error!',
+                    'Invalid data, Please try again!.',
+                    'error'
+                );
+                return;
+            }
         }
     })
 }
 
-async function fit(xs, ys) {
-    const response = await model.fit(xs, ys);
-    console.log(response.history.loss[0]);
-}
+// async function fit(xs, ys) {
+//     const response = await model.fit(xs, ys);
+//     loss = ((1 - response.history.loss[0])*100).toPrecision(5);
+//     console.log(response.history.loss[0]);
+// }
 
 async function train() {
     for (let i = 0; i <= document.getElementById("iteration").value; i++) {
@@ -576,12 +491,11 @@ async function train() {
             epochs: document.getElementById('epochs').value
         };
         const response = await model.fit(xs, ys, training_setting);
-        document.getElementById('trainning_score_status').innerHTML = 'Trainning Score: '+((1-response.history.loss[0])*100).toPrecision(5) + '%';
+        document.getElementById('trainning_score_status').innerHTML = 'Trainning Score: '+((1 - response.history.loss[0])*100).toPrecision(5) + '%';
         document.getElementById('trainning_status').innerHTML = 'Status : Trainning';
-        console.log(response.history.loss[0]);
+        loss = ((1 - response.history.loss[0])*100).toPrecision(5);
+        log('Trainnig model with '+ training_setting.toString() + 'MeanSquareError : ' +((response.history.loss[0])).toPrecision(5));
+        // console.log(response.history.loss[0]);
     }
 }
-
-
-        // let outputs = model.predict(input);
-        // outputs.print();
+// -------------------End of NN --------------------------------

@@ -163,7 +163,7 @@
                 </div>
                 <div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
                     <button onclick="document.getElementById('terminal').style.display='none'" type="button" class="w3-button w3-red">Close</button>
-                    <span class="w3-right w3-padding w3-small"><button class="fa fa-save w3-padding-small w3-green"></button>&nbsp;Save as txt?</span>
+                    <span class="w3-right w3-padding w3-small"><a class="fa fa-download w3-padding-small w3-green" id="download_log" download="data_log.txt" onclick="downloadTxt()"></a>&nbsp;Save as txt?</span>
                 </div>
 
             </div>
@@ -424,6 +424,13 @@
             'Matured',
             'Prematured'
         ];
+        
+        let dataStr1 = "data:text/json;charset=utf-8," + encodeURIComponent(((localStorage.getItem('labeled'))));
+        let dlAnchorElem = document.getElementById('download_json');
+        dlAnchorElem.setAttribute("href", dataStr1);
+        dlAnchorElem.setAttribute("download", "spectral_data.json");
+        
+        const jsonFile = document.getElementById('trainning_data').addEventListener("change", handleFile, false);
 
         function popup_labeling_data() {
             removeDataset(labelingChart);
@@ -437,78 +444,83 @@
                 confirmButtonText: 'Submit'
             }).then((result) => {
                 if (result.value) {
-                    json = JSON.parse(result.value);
-                    let data = [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6];
-                    addDataset(labelingChart, "Scanned", data)
-                    input = tf.tensor2d([
-                        [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6]
-                    ]);
+                    try {
+                        json = JSON.parse(result.value);
+                        let data = [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6];
+                        addDataset(labelingChart, "Scanned", data);
+                        input = tf.tensor2d([
+                            [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6]
+                        ]);
+                    } catch (e) {
+                        console.log(e);
+                        Swal.fire({
+                            title: 'Error!',
+                            html: 'Invalid Data.',
+                            icon: 'error'
+                        })
+                        return;
+                    }
                     Swal.fire({
-                        title: 'Saved!',
-                        html: result.value,
+                        title: 'Saved!', 
+                        html: 'Data is ready to label.',
                         icon: 'success'
                     })
-                } else {
-                    Swal.fire(
-                        'Error!',
-                        'No hardware Connercted.',
-                        'error'
-                    )
                 }
             })
         }
 
         function SaveDataToLocalStorage(location, data) {
             var a = [];
-            // Parse the serialized data back into an aray of objects
-            a = JSON.parse(localStorage.getItem(location)) || [];
-            // Push the new data (whether it be an object or anything else) onto the array
-            a.push(data);
-            // Alert the array value
-            // Re-serialize the array back into a string and store it in localStorage
-            localStorage.setItem('labeled', JSON.stringify(a));
+            a = JSON.parse(localStorage.getItem(location)) || []; // Parse the serialized data back into an aray of objects
+            a.push(data); // Push the new data (whether it be an object or anything else) onto the array
+            localStorage.setItem('labeled', JSON.stringify(a)); // Re-serialize the array back into a string and store it in localStorage
+            log('Saving labeled data to the local storage of the browser; Loacation :' +location );
         }
-
-        var dataStr1 = "data:text/json;charset=utf-8," + encodeURIComponent(((localStorage.getItem('labeled'))));
-        var dlAnchorElem = document.getElementById('download_json');
-        dlAnchorElem.setAttribute("href", dataStr1);
-        dlAnchorElem.setAttribute("download", "spectral_data.json");
 
         async function download_model_json() {
             const model_json = await model.save('downloads://NIR_model');
+            log('Downloading trained model as .json file');
             const model_json_localStorage = await model.save('localstorage://NIR_model');
+            log('Downloading trained model to local storage of the browser');
         }
         async function load_model_json() {
             const load_model_json = await tf.loadLayersModel('localstorage://NIR_model');
-            log()
+            log('Loading trained model from local storage of the browser');
         }
-
-
-
-        const jsonFile = document.getElementById('trainning_data');
-        jsonFile.addEventListener("change", handleFile, false);
 
         function handleFile() {
             const file = this.files[0];
             const reader = new FileReader();
             reader.onload = function(e) {
-                var jsonData = JSON.parse(e.target.result);
-                let temp_xs = [];
-                let temp_ys = [];
-                jsonData.forEach(function(data, index) {
-                    temp_xs.push([data.ch1, data.ch2, data.ch3, data.ch4, data.ch5, data.ch6]);
-                    temp_ys.push(data.label_args);
-                })
-                console.log(temp_ys);
-                xs = tf.tensor2d(temp_xs);
-                let indices = tf.tensor1d(temp_ys, 'int32');
-                ys = tf.oneHot(indices, 3);
-                indices.print();
-                xs.print();
-                ys.print();
+                try {
+                    let jsonData = JSON.parse(e.target.result);
+                    let temp_xs = [];
+                    let temp_ys = [];
+                    jsonData.forEach(function(data, index) {
+                        temp_xs.push([data.ch1, data.ch2, data.ch3, data.ch4, data.ch5, data.ch6]);
+                        temp_ys.push(data.label_args);
+                    })
+                    console.log(temp_ys);
+                    xs = tf.tensor2d(temp_xs);
+                    let indices = tf.tensor1d(temp_ys, 'int32');
+                    ys = tf.oneHot(indices, 3);
+                    indices.print();
+                    xs.print();
+                    ys.print();
+                } catch (e) {
+                    console.log(e);
+                    Swal.fire({
+                        title: 'Error Loading File!',
+                        html: 'invalid json file',
+                        icon: 'error'
+                    })
+                    return false;
+                }
             };
             reader.readAsText(file);
+            log('Loading Dataset with filename: '+file.name, +' size : '+file.size);
         }
+        
     </script>
     <script src="./assets/js/controller.js"></script>
 
