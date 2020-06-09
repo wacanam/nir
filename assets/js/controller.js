@@ -576,13 +576,13 @@ async function train() {
             shuffle: true,
             epochs: document.getElementById("epochs").value,
         };
+        document.getElementById("training_status").innerHTML =
+        '<i class="fa fa-spinner fa-spin"style="font-size:20px;color:teal;"></i> Status : Training';
         const response = await model.fit(xs, ys, training_setting);
         document.getElementById("training_score_status").innerHTML =
             "Training Score: " +
             ((1 - response.history.loss[0]) * 100).toPrecision(5) +
             "%";
-        document.getElementById("training_status").innerHTML =
-            '<i class="fa fa-spinner fa-spin"style="font-size:20px;color:teal;"></i> Status : Training';
         loss = ((1 - response.history.loss[0]) * 100).toPrecision(5);
         log(
             "Training model with " +
