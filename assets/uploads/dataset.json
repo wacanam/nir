@@ -1,0 +1,63 @@
+[
+    {
+      "ch1": 2.5,
+      "ch2": 6,
+      "ch3": 16,
+      "ch4": 24,
+      "ch5": 32.5,
+      "ch6": 32.6,
+      "label_args": 1,
+      "label": "Ripe"
+    },
+    {
+      "ch1": 6,
+      "ch2": 10,
+      "ch3": 24,
+      "ch4": 35.5,
+      "ch5": 42,
+      "ch6": 41.5,
+      "label_args": 2,
+      "label": "Mature"
+    },
+    {
+      "ch1": 4,
+      "ch2": 5.5,
+      "ch3": 14,
+      "ch4": 18,
+      "ch5": 27.5,
+      "ch6": 28,
+      "label_args": 1,
+      "label": "Ripe"
+    },
+    {
+      "ch1": 2.5,
+      "ch2": 3,
+      "ch3": 7,
+      "ch4": 11,
+      "ch5": 15,
+      "ch6": 16,
+      "label_args": 0,
+      "label": "Unknown"
+    },
+    {
+      "ch1": 4,
+      "ch2": 6,
+      "ch3": 15,
+      "ch4": 23,
+      "ch5": 25,
+      "ch6": 30.5,
+      "label_args": 1,
+      "label": "Ripe"
+    },
+    {
+      "ch1": 7.5,
+      "ch2": 8,
+      "ch3": 20.5,
+      "ch4": 29.5,
+      "ch5": 34,
+      "ch6": 35.5,
+      "label_args": 2,
+      "label": "Mature"
+    }
+  ]
+  

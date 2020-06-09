@@ -22,7 +22,7 @@
 
 <body onload="javascript:connect()">
 
-    <div class="w3-sidebar w3-bar-block w3-collapse w3-card w3-green" style="width:225px;" id="mySidebar">
+    <div class="w3-sidebar w3-bar-block w3-collapse w3-card w3-green" style="width:215px;" id="mySidebar">
         <button class="w3-bar-item w3-button w3-hide-large w3-right-align" id="home_tab" onclick="w3_close()"><b>&times;</b></button>
         <button href="#" class="w3-bar-item w3-button w3-large w3-wide"><i class="fa fa-home"></i>&nbsp;Home</button>
         <button href="#" class="w3-bar-item w3-button w3-large w3-wide" id="login_tab" onclick="document.getElementById('login').style.display ='block'"><i class="fa fa-sign-in"></i>&nbsp;Login</button>
@@ -213,8 +213,8 @@
                 </div>
                 <div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
                     <button onclick="document.getElementById('trainning').style.display='none'" type="button" class="w3-button w3-red">Close</button>
-                    <span class="w3-right w3-padding w3-small"><a class="fa fa-download w3-padding-small w3-green" id="download_model_json" onclick="download_model_json().then(() => {Swal.fire('Saved!', 'success')})"></a>&nbsp;Download model as .jSON</span>
-                    <span class="w3-right w3-padding w3-small"><a class="fa fa-refresh w3-padding-small w3-blue" onclick="load_model_json().then(()=> {Swal.fire({title: 'Loaded!', icon: 'success' })})"></a>&nbsp;Load Model</span>
+                    <span class="w3-right w3-padding w3-small"><a class="fa fa-download w3-padding-small w3-green" id="download_model_json" onclick="download_model_json().then(() => {Swal.fire({title: 'Saved!', icon: 'success'})})"></a>&nbsp;Download model as .jSON</span>
+                    <span class="w3-right w3-padding w3-small"><a class="fa fa-refresh w3-padding-small w3-blue" onclick="loadModel().then(()=> {Swal.fire({title: 'Loaded!', icon: 'success' })})"></a>&nbsp;Load Model</span>
                 </div>
 
             </div>
@@ -419,10 +419,10 @@
     <script>
         var json = {};
         let labelList = [
-            'Unknown',
+            'Premature',
             'Ripe',
-            'Matured',
-            'Prematured'
+            'Mature',
+            'Unknown'
         ];
         
         let dataStr1 = "data:text/json;charset=utf-8," + encodeURIComponent(((localStorage.getItem('labeled'))));
@@ -452,7 +452,7 @@
                             [json.ch1, json.ch2, json.ch3, json.ch4, json.ch5, json.ch6]
                         ]);
                     } catch (e) {
-                        console.log(e);
+                        // console.log(e);
                         Swal.fire({
                             title: 'Error!',
                             html: 'Invalid Data.',
@@ -484,7 +484,7 @@
             log('Downloading trained model to local storage of the browser');
         }
         async function load_model_json() {
-            const load_model_json = await tf.loadLayersModel('localstorage://NIR_model');
+            model = await tf.loadLayersModel('localstorage://NIR_model');
             log('Loading trained model from local storage of the browser');
         }
 
@@ -500,15 +500,15 @@
                         temp_xs.push([data.ch1, data.ch2, data.ch3, data.ch4, data.ch5, data.ch6]);
                         temp_ys.push(data.label_args);
                     })
-                    console.log(temp_ys);
+                    // console.log(temp_ys);
                     xs = tf.tensor2d(temp_xs);
                     let indices = tf.tensor1d(temp_ys, 'int32');
                     ys = tf.oneHot(indices, 3);
-                    indices.print();
-                    xs.print();
-                    ys.print();
+                    // indices.print();
+                    // xs.print();
+                    // ys.print();
                 } catch (e) {
-                    console.log(e);
+                    // console.log(e);
                     Swal.fire({
                         title: 'Error Loading File!',
                         html: 'invalid json file',
