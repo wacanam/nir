@@ -204,7 +204,7 @@
                     <label>Shuffle</label>
 
                     <p>
-                        <button class="w3-btn w3-teal" id="train" onclick="train().then(() => { document.getElementById('training_status').innerHTML = 'Status : ing Complete!';});">Train</button>
+                        <button class="w3-btn w3-teal" id="train" onclick="train().then(() => { document.getElementById('training_status').innerHTML = 'Status : training Complete!';});">Train</button>
 
                         <span class="w3-right w3-padding w3-small" id="training_score_status">Training Score :0%</span>
                         <span class="w3-right w3-padding w3-small" id="training_status">Status: N/A</span>
