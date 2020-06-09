@@ -473,7 +473,7 @@ async function loadModel() {
     model = await tf.loadLayersModel(
         "http://" +
         window.location.host +
-        "/data/assets/uploads/NIR_model.json"
+        "/assets/uploads/NIR_model.json"
     );
     // model.summary();
     compileModel();
